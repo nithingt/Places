@@ -141,6 +141,22 @@ function enterPlace(place) {
   showReveal(place.title, place.sub, isNew ? "Region Discovered" : "Entering");
 }
 
+// The wide letter spacing makes long names overflow, so shrink the name until it
+// fits on one line. Very long names stop shrinking at a readable size and wrap.
+const MIN_NAME_PX = 28;
+function fitName() {
+  const name = els.name;
+  name.style.fontSize = "";
+  name.style.whiteSpace = "nowrap";
+  const available = els.reveal.clientWidth - 32; // minus the side padding
+  const needed = name.scrollWidth;
+  if (needed > available) {
+    const size = parseFloat(getComputedStyle(name).fontSize);
+    name.style.fontSize = `${Math.max(MIN_NAME_PX, Math.floor(size * available / needed))}px`;
+  }
+  name.style.whiteSpace = "";
+}
+
 let hideTimer = null;
 // What the reveal is currently showing, and when it started.
 // The video recorder reads this to draw the same animation into the video.
@@ -164,6 +180,7 @@ function showReveal(title, sub, label) {
     s.style.animationDelay = `${delays[i]}s, 6.4s`;
     els.name.appendChild(s);
   });
+  fitName();
   revealState = { title, sub: sub || "", label, delays, start: performance.now() };
 
   els.reveal.classList.add("show");
