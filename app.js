@@ -34,16 +34,34 @@ function markVisited(key) {
 function setStatus(text) { els.status.textContent = text || ""; }
 
 // ---------- Camera ----------
+let cameraInfo = "";
+
+// Browsers default to a small feed (often 640×480) unless asked for more,
+// which looks blurry when stretched over a large phone screen.
 async function startCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } }, audio: false,
-    });
-    els.video.srcObject = stream;
-  } catch (e) {
-    console.warn("Camera unavailable:", e);
-    setStatus("Camera unavailable. Showing the reveal without it.");
+  const attempts = [
+    { facingMode: { ideal: "environment" }, width: { ideal: 3840 }, height: { ideal: 2160 }, frameRate: { ideal: 30 } },
+    { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    { facingMode: { ideal: "environment" } },
+  ];
+  for (const video of attempts) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video, audio: false });
+      els.video.srcObject = stream;
+      const track = stream.getVideoTracks()[0];
+      // Keep the picture sharp as you look around, where supported.
+      const caps = track.getCapabilities ? track.getCapabilities() : {};
+      if (caps.focusMode && caps.focusMode.includes("continuous")) {
+        track.applyConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {});
+      }
+      const s = track.getSettings();
+      cameraInfo = s.width ? `${s.width}×${s.height}` : "";
+      return;
+    } catch (e) {
+      console.warn("Camera attempt failed:", video, e);
+    }
   }
+  setStatus("Camera unavailable. Showing the reveal without it.");
 }
 
 // ---------- Location → place name ----------
@@ -96,7 +114,7 @@ async function onPosition(pos) {
   lastLookup = { at: now, lat, lon };
   try {
     const place = await reverseGeocode(lat, lon);
-    setStatus(`± ${Math.round(accuracy)} m`);
+    setStatus(`± ${Math.round(accuracy)} m` + (cameraInfo ? ` · camera ${cameraInfo}` : ""));
     if (!current || current.key !== place.key) enterPlace(place);
   } catch (e) {
     console.warn(e);
@@ -208,6 +226,7 @@ els.startBtn.addEventListener("click", async () => {
 
   // Demo mode for testing anywhere: ?demo=Kyoto&sub=Japan
   if (params.has("demo")) {
+    if (cameraInfo) setStatus(`camera ${cameraInfo}`);
     setTimeout(() => showReveal(params.get("demo"), params.get("sub") || "", "Region Discovered"), 600);
     return;
   }
