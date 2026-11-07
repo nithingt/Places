@@ -142,6 +142,10 @@ function enterPlace(place) {
 }
 
 let hideTimer = null;
+// What the reveal is currently showing, and when it started.
+// The video recorder reads this to draw the same animation into the video.
+let revealState = null;
+
 function showReveal(title, sub, label) {
   els.reveal.classList.remove("show");
   void els.reveal.offsetWidth; // restart CSS animations
@@ -152,14 +156,15 @@ function showReveal(title, sub, label) {
   // One span per letter so each can materialize on its own, from the middle outwards.
   const chars = [...title];
   const mid = (chars.length - 1) / 2;
+  const delays = chars.map((c, i) => 0.9 + Math.abs(i - mid) * 0.07 + Math.random() * 0.12);
   chars.forEach((c, i) => {
     const s = document.createElement("span");
     s.className = "ch";
     s.textContent = c;
-    const delay = 0.9 + Math.abs(i - mid) * 0.07 + Math.random() * 0.12;
-    s.style.animationDelay = `${delay}s, 6.4s`;
+    s.style.animationDelay = `${delays[i]}s, 6.4s`;
     els.name.appendChild(s);
   });
+  revealState = { title, sub: sub || "", label, delays, start: performance.now() };
 
   els.reveal.classList.add("show");
   document.body.classList.add("revealing");
@@ -236,9 +241,17 @@ els.startBtn.addEventListener("click", async () => {
   startLocation();
 });
 
-// Tap anywhere to replay the current place's reveal.
+// The place to show when replaying or recording, if we know one yet.
+function placeForReplay() {
+  if (current) return current;
+  if (params.has("demo")) return { title: params.get("demo"), sub: params.get("sub") || "" };
+  return null;
+}
+
+// Tap anywhere (except on the controls) to replay the current place's reveal.
 document.addEventListener("click", (e) => {
-  if (e.target === els.startBtn || !els.start.classList.contains("hidden")) return;
-  if (current) showReveal(current.title, current.sub, "You Are In");
-  else if (params.has("demo")) showReveal(params.get("demo"), params.get("sub") || "", "Region Discovered");
+  if (!els.start.classList.contains("hidden")) return;
+  if (e.target.closest("button, #controls, #preview")) return;
+  const place = placeForReplay();
+  if (place) showReveal(place.title, place.sub, current ? "You Are In" : "Region Discovered");
 });

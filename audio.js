@@ -4,13 +4,19 @@
 const DiscoverySound = (() => {
   let ctx = null;
   let reverb = null;
+  let master = null;      // everything plays through this
+  let recordDest = null;  // a copy of the sound for video recordings
 
   // Browsers only allow audio after a user gesture, so call this from a tap.
   function unlock() {
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      master.connect(ctx.destination);
+      recordDest = ctx.createMediaStreamDestination();
+      master.connect(recordDest);
       reverb = makeReverb(4.5);
-      reverb.connect(ctx.destination);
+      reverb.connect(master);
     }
     if (ctx.state === "suspended") ctx.resume();
   }
@@ -42,7 +48,7 @@ const DiscoverySound = (() => {
   function out(node, dry = 1, wet = 0.6) {
     const d = ctx.createGain(); d.gain.value = dry;
     const w = ctx.createGain(); w.gain.value = wet;
-    node.connect(d).connect(ctx.destination);
+    node.connect(d).connect(master);
     node.connect(w).connect(reverb.input);
   }
 
@@ -119,5 +125,8 @@ const DiscoverySound = (() => {
     shimmer(t + 0.9);
   }
 
-  return { unlock, play };
+  // Audio track that video recordings can include.
+  function stream() { return recordDest ? recordDest.stream : null; }
+
+  return { unlock, play, stream };
 })();

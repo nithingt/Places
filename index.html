@@ -39,7 +39,24 @@
 
   <div id="status"></div>
 
+  <!-- Record a video of the reveal -->
+  <div id="controls">
+    <span id="recordTime">0:00</span>
+    <button id="recordBtn" aria-label="Record video"><span></span></button>
+  </div>
+
+  <!-- Shown after a recording finishes -->
+  <div id="preview" role="dialog" aria-label="Your recording">
+    <video id="previewVideo" playsinline loop controls></video>
+    <div class="preview-actions">
+      <button id="shareBtn">Share</button>
+      <button id="saveBtn">Save</button>
+      <button id="discardBtn">Close</button>
+    </div>
+  </div>
+
   <script src="audio.js"></script>
   <script src="app.js"></script>
+  <script src="recorder.js"></script>
 </body>
 </html>
