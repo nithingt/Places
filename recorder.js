@@ -29,7 +29,6 @@ const Recorder = (() => {
   const prog = (t, start, dur) => clamp01((t - start) / dur);
   const easeOut = (x) => 1 - Math.pow(1 - x, 3);
   const easeIn = (x) => x * x;
-  const easeOutBack = (x) => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
 
   // The "fade, blur and drift up" exit used by every text element.
   function outAmount(t, start, dur) { return easeIn(prog(t, start, dur)); }
@@ -76,7 +75,7 @@ const Recorder = (() => {
 
   // Text with the same soft glow as the CSS text-shadow.
   function glowText(text, x, y, glow, glowBlur) {
-    g.shadowColor = "rgba(0,0,0,0.85)"; g.shadowBlur = 10; g.shadowOffsetY = 2;
+    g.shadowColor = "rgba(0,0,0,0.45)"; g.shadowBlur = 7; g.shadowOffsetY = 1;
     g.fillText(text, x, y);
     if (glow) {
       g.shadowColor = glow; g.shadowBlur = glowBlur; g.shadowOffsetY = 0;
@@ -90,7 +89,6 @@ const Recorder = (() => {
     if (!st) return;
     const reveal = els.reveal;
     const top = reveal.offsetTop;
-    const rh = reveal.offsetHeight;
     const css = (el) => getComputedStyle(el);
 
     // Vignette around the screen edges (fades in with the reveal, out at 6.4s)
@@ -98,54 +96,25 @@ const Recorder = (() => {
     ellipse(W / 2, H / 2, (W / 2) * Math.SQRT2, (H / 2) * Math.SQRT2,
       [[0, "rgba(0,0,0,0)"], [0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.45)"]], vig);
 
-    // Dark band behind the text
-    const shade = Math.min(easeOut(prog(t, 0, 1.2)), 1 - prog(t, 6.2, 1.4));
-    ellipse(W / 2, top + rh / 2, 0.7 * W * Math.SQRT2, 170 * Math.SQRT2,
-      [[0, "rgba(0,0,0,0.5)"], [0.4, "rgba(0,0,0,0.25)"], [0.7, "rgba(0,0,0,0)"]], shade);
-
     g.textBaseline = "middle";
 
-    // "REGION DISCOVERED": letters pull together from wide spacing
+    // "Entering" / "Region Discovered": letters pull together from wide spacing
     {
       const el = els.label, cs = css(el);
       const size = parseFloat(cs.fontSize);
       const p = easeOut(prog(t, 0.2, 1.6));
       const out = outAmount(t, 6.2, 1.2);
-      const spacing = (1.2 - 0.65 * p) * size;
-      g.font = `500 ${size}px Inter, system-ui, sans-serif`;
+      const spacing = (0.8 - 0.63 * p) * size;   // 0.8em → 0.17em, as in style.css
+      g.font = `400 ${size}px Inter, system-ui, sans-serif`;
       g.letterSpacing = `${spacing}px`;
       g.textAlign = "center";
-      g.fillStyle = "#d9c79a";
+      g.fillStyle = "#fff";
       g.globalAlpha = p * (1 - out);
       const blur = (6 * (1 - p) + 10 * out) * k;
       g.filter = blur > 0.3 ? `blur(${blur}px)` : "none";
-      glowText(st.label.toUpperCase(), W / 2 + spacing / 2, top + el.offsetTop + el.offsetHeight / 2 - 6 * out, null, 0);
+      glowText(st.label, W / 2 + spacing / 2, top + el.offsetTop + el.offsetHeight / 2 - 6 * out, null, 0);
       g.filter = "none"; g.letterSpacing = "0px"; g.globalAlpha = 1;
     }
-
-    // The two gold rules with a diamond in the middle
-    document.querySelectorAll("#reveal .rule").forEach((el) => {
-      const y = top + el.offsetTop + el.offsetHeight / 2;
-      const half = el.offsetWidth / 2;
-      const grow = easeOut(prog(t, 0.6, 1.4));
-      const gem = easeOutBack(prog(t, 0.7, 0.8));
-      const out = outAmount(t, 6.0, 1.2);
-      g.globalAlpha = prog(t, 0.6, 0.4) * (1 - out);
-      const len = (half - 16) * grow;
-      [[-1], [1]].forEach(([dir]) => {
-        const x0 = W / 2 + dir * 16, x1 = x0 + dir * len;
-        const grad = g.createLinearGradient(x0, 0, x1, 0);
-        grad.addColorStop(0, "#d9c79a"); grad.addColorStop(1, "rgba(217,199,154,0)");
-        g.fillStyle = grad;
-        g.fillRect(Math.min(x0, x1), y - 0.5, Math.abs(x1 - x0), 1);
-      });
-      g.save();
-      g.translate(W / 2, y); g.rotate(Math.PI / 4); g.scale(gem, gem);
-      g.strokeStyle = "#d9c79a"; g.lineWidth = 1;
-      g.strokeRect(-3, -3, 6, 6);
-      g.restore();
-      g.globalAlpha = 1;
-    });
 
     // The place name, one letter at a time from the middle outwards
     {
@@ -154,13 +123,14 @@ const Recorder = (() => {
       g.font = `400 ${size}px "New Amsterdam", Inter, sans-serif`;
       g.textAlign = "center";
       g.letterSpacing = "0px";
-      g.fillStyle = "#f4efe4";
+      g.fillStyle = "#fff";
+      const halfSpacing = parseFloat(cs.letterSpacing) / 2 || 0;
       const out = outAmount(t, 6.4, 1.4);
       [...nameEl.children].forEach((span, i) => {
         const p = prog(t, st.delays[i], 1.4);
         if (p <= 0) return;
         const e = easeOut(p);
-        const x = span.offsetLeft + span.offsetWidth / 2 - size * 0.03; // ignore trailing letter-spacing
+        const x = span.offsetLeft + span.offsetWidth / 2 - halfSpacing; // ignore trailing letter-spacing
         const y = top + span.offsetTop + span.offsetHeight / 2 + 10 * (1 - e) - 6 * out;
         const scale = 1.35 - 0.35 * e;
         const flash = p < 0.6 ? p / 0.6 : 1 - (p - 0.6) / 0.4;  // brief bright glow mid-way
@@ -169,26 +139,26 @@ const Recorder = (() => {
         const blur = (14 * (1 - e) + 10 * out) * k;
         g.filter = blur > 0.3 ? `blur(${blur}px)` : "none";
         g.translate(x, y); g.scale(scale, scale);
-        glowText(span.textContent.toUpperCase(), 0, 0, `rgba(255,244,220,${0.55 + 0.45 * flash})`, 18 + 30 * flash);
+        glowText(span.textContent.toUpperCase(), 0, 0, `rgba(255,244,220,${0.22 + 0.78 * flash})`, 10 + 38 * flash);
         g.restore();
       });
       g.filter = "none";
     }
 
-    // City · Country underneath
+    // Country (or City · Country) underneath
     if (st.sub) {
       const el = els.sub, cs = css(el);
       const size = parseFloat(cs.fontSize);
       const p = easeOut(prog(t, 2.2, 1.4));
       const out = outAmount(t, 6.0, 1.2);
-      const spacing = (0.6 - 0.3 * p) * size;
+      const spacing = (0.45 - 0.28 * p) * size;  // 0.45em → 0.17em, as in style.css
       g.font = `400 ${size}px Inter, system-ui, sans-serif`;
       g.letterSpacing = `${spacing}px`;
       g.textAlign = "center";
-      g.fillStyle = "rgba(244,239,228,0.85)";
+      g.fillStyle = "#fff";
       g.globalAlpha = p * (1 - out);
       g.filter = out ? `blur(${10 * out * k}px)` : "none";
-      glowText(st.sub.toUpperCase(), W / 2 + spacing / 2, top + el.offsetTop + el.offsetHeight / 2 + 6 * (1 - p) - 6 * out, null, 0);
+      glowText(st.sub, W / 2 + spacing / 2, top + el.offsetTop + el.offsetHeight / 2 + 6 * (1 - p) - 6 * out, null, 0);
       g.filter = "none"; g.letterSpacing = "0px"; g.globalAlpha = 1;
     }
   }
