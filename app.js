@@ -162,11 +162,14 @@ function showReveal(title, sub, label) {
   });
 
   els.reveal.classList.add("show");
+  document.body.classList.add("revealing");
   DiscoverySound.play();
   burstMotes();
 
   clearTimeout(hideTimer);
   hideTimer = setTimeout(() => els.reveal.classList.remove("show"), 8200);
+  clearTimeout(showReveal.dimTimer);
+  showReveal.dimTimer = setTimeout(() => document.body.classList.remove("revealing"), 6400);
 }
 
 // ---------- Drifting light motes during the reveal ----------
