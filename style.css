@@ -185,3 +185,61 @@ body.revealing #vignette { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   #reveal.show .name .ch { animation-duration: 0.01s, 1.4s; }
 }
+
+/* ---------- Record button ---------- */
+#status { bottom: calc(112px + env(safe-area-inset-bottom)); }
+
+#controls {
+  position: fixed; left: 0; right: 0;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  z-index: 5;
+}
+#recordBtn {
+  width: 68px; height: 68px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.9);
+  background: rgba(0,0,0,0.15);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+#recordBtn span {
+  width: 50px; height: 50px; border-radius: 50%;
+  background: #e5484d;
+  transition: all 0.25s ease;
+}
+#recordTime {
+  font-size: 13px; letter-spacing: 0.12em; color: #fff;
+  background: rgba(229,72,77,0.85); padding: 2px 10px; border-radius: 10px;
+  visibility: hidden;
+}
+#controls.recording #recordTime { visibility: visible; }
+#controls.recording #recordBtn span { width: 26px; height: 26px; border-radius: 5px; }
+#controls.recording #recordBtn { animation: recPulse 1.4s ease-in-out infinite; }
+@keyframes recPulse { 50% { box-shadow: 0 0 0 8px rgba(229,72,77,0.25); } }
+
+/* ---------- Recording preview ---------- */
+#preview {
+  position: fixed; inset: 0; z-index: 20;
+  background: rgba(5,6,7,0.92);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+}
+#preview.open { display: flex; }
+#preview video {
+  max-width: 100%; max-height: calc(100% - 90px);
+  border: 1px solid rgba(217,199,154,0.4);
+  background: #000;
+}
+.preview-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.preview-actions button {
+  font-family: "Cinzel", serif; font-size: 14px; letter-spacing: 0.25em;
+  padding: 12px 20px 12px 24px; min-width: 96px;
+  color: var(--ink); background: transparent;
+  border: 1px solid var(--gold); border-radius: 0; cursor: pointer;
+}
+.preview-actions button:active { background: rgba(217,199,154,0.15); }
+#shareBtn { background: rgba(217,199,154,0.18); }
+.preview-actions button[hidden] { display: none; }
+#controls[hidden] { display: none; }
