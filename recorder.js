@@ -112,7 +112,7 @@ const Recorder = (() => {
       const p = easeOut(prog(t, 0.2, 1.6));
       const out = outAmount(t, 6.2, 1.2);
       const spacing = (1.2 - 0.65 * p) * size;
-      g.font = `400 ${size}px Cinzel, serif`;
+      g.font = `500 ${size}px Inter, system-ui, sans-serif`;
       g.letterSpacing = `${spacing}px`;
       g.textAlign = "center";
       g.fillStyle = "#d9c79a";
@@ -151,7 +151,7 @@ const Recorder = (() => {
     {
       const nameEl = els.name, cs = css(nameEl);
       const size = parseFloat(cs.fontSize);
-      g.font = `400 ${size}px Cinzel, serif`;
+      g.font = `400 ${size}px "New Amsterdam", Inter, sans-serif`;
       g.textAlign = "center";
       g.letterSpacing = "0px";
       g.fillStyle = "#f4efe4";
@@ -160,7 +160,7 @@ const Recorder = (() => {
         const p = prog(t, st.delays[i], 1.4);
         if (p <= 0) return;
         const e = easeOut(p);
-        const x = span.offsetLeft + span.offsetWidth / 2 - size * 0.06; // ignore trailing letter-spacing
+        const x = span.offsetLeft + span.offsetWidth / 2 - size * 0.03; // ignore trailing letter-spacing
         const y = top + span.offsetTop + span.offsetHeight / 2 + 10 * (1 - e) - 6 * out;
         const scale = 1.35 - 0.35 * e;
         const flash = p < 0.6 ? p / 0.6 : 1 - (p - 0.6) / 0.4;  // brief bright glow mid-way
@@ -182,7 +182,7 @@ const Recorder = (() => {
       const p = easeOut(prog(t, 2.2, 1.4));
       const out = outAmount(t, 6.0, 1.2);
       const spacing = (0.6 - 0.3 * p) * size;
-      g.font = `400 ${size}px Marcellus, Georgia, serif`;
+      g.font = `400 ${size}px Inter, system-ui, sans-serif`;
       g.letterSpacing = `${spacing}px`;
       g.textAlign = "center";
       g.fillStyle = "rgba(244,239,228,0.85)";

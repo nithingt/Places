@@ -59,3 +59,5 @@ Then open http://localhost:8000/?demo=Kyoto (desktop browsers allow camera on lo
 - `app.js`: camera, location, place lookup and the reveal
 - `audio.js`: the discovery sound
 - `recorder.js`: records the reveal to a video
+- `fonts/`: New Amsterdam, used for place names (SIL Open Font License, see `fonts/OFL.txt`).
+  Other text uses Inter from Google Fonts.
