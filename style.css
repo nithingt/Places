@@ -1,3 +1,12 @@
+/* Place names: New Amsterdam (bundled, SIL Open Font License, see fonts/OFL.txt).
+   Everything else: Inter. */
+@font-face {
+  font-family: "New Amsterdam";
+  src: url("fonts/NewAmsterdam-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: block;
+}
+
 :root {
   --ink: #f4efe4;
   --gold: #d9c79a;
@@ -11,7 +20,7 @@ html, body {
   background: #000;
   color: var(--ink);
   overflow: hidden;
-  font-family: "Marcellus", Georgia, serif;
+  font-family: "Inter", system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
@@ -58,8 +67,9 @@ body.revealing #vignette { opacity: 1; }
 }
 
 .label {
-  font-family: "Cinzel", serif;
-  font-size: clamp(11px, 3.2vw, 18px);
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(10px, 2.9vw, 16px);
   letter-spacing: 0.55em;
   text-transform: uppercase;
   color: var(--gold);
@@ -70,11 +80,11 @@ body.revealing #vignette { opacity: 1; }
 }
 
 .name {
-  font-family: "Cinzel", serif;
+  font-family: "New Amsterdam", "Inter", sans-serif;
   font-weight: 400;
-  font-size: clamp(30px, 10vw, 76px);
-  line-height: 1.1;
-  letter-spacing: 0.12em;
+  font-size: clamp(40px, 14vw, 104px);
+  line-height: 1.05;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink);
   text-shadow: 0 0 18px var(--glow), 0 2px 10px rgba(0,0,0,0.9);
@@ -157,14 +167,14 @@ body.revealing #vignette { opacity: 1; }
 #start.hidden { opacity: 0; pointer-events: none; }
 .start-inner { text-align: center; max-width: 360px; }
 .start-inner h2 {
-  font-family: "Cinzel", serif; font-weight: 400;
-  font-size: 44px; letter-spacing: 0.25em; padding-left: 0.25em;
+  font-family: "Inter", system-ui, sans-serif; font-weight: 300;
+  font-size: 40px; letter-spacing: 0.25em; padding-left: 0.25em;
   text-shadow: 0 0 20px var(--glow);
 }
 .start-inner p { margin: 18px 0 32px; line-height: 1.6; color: rgba(244,239,228,0.75); }
 .start-inner small { display: block; margin-top: 18px; color: rgba(244,239,228,0.45); font-size: 12px; }
 #startBtn {
-  font-family: "Cinzel", serif; font-size: 16px;
+  font-family: "Inter", system-ui, sans-serif; font-weight: 500; font-size: 16px;
   letter-spacing: 0.4em; padding: 14px 32px 14px 38px;
   color: var(--ink); background: transparent;
   border: 1px solid var(--gold); border-radius: 0;
@@ -234,7 +244,7 @@ body.revealing #vignette { opacity: 1; }
 }
 .preview-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .preview-actions button {
-  font-family: "Cinzel", serif; font-size: 14px; letter-spacing: 0.25em;
+  font-family: "Inter", system-ui, sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.25em;
   padding: 12px 20px 12px 24px; min-width: 96px;
   color: var(--ink); background: transparent;
   border: 1px solid var(--gold); border-radius: 0; cursor: pointer;
